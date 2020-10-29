@@ -1,8 +1,8 @@
 ---
 modules:
   01_introduction:
-    name: GitOps with RedHat Ansible Tower
-    exit_sign: Overview
+    name: Wilson Rocks
+    exit_sign: Very Nice Lab
   02_overview:
     name: Overview
     exit_sign: Exercise 1.1
