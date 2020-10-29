@@ -1,0 +1,81 @@
+:GUID: %unique_guid%
+:OSP_DOMAIN: %dns_zone%
+:TOWER_URL: %tower_url%
+:TOWER_ADMIN: %tower_admin%
+:TOWER_ADMIN_PASSWORD: %tower_admin_password%
+:SATELLITE_URL: %satellite_url%
+:SATELLITE_ADMIN: %satellite_admin%
+:SATELLITE_ADMIN_PASSWORD: %satellite_admin_password%
+:SSH_COMMAND: %ssh_command%
+:SSH_PASSWORD: %ssh_password%
+:organization_name: gpte
+:source-linenums-option:        
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+:data-uri:
+:linkattrs:
+:numbered:
+
+=== Verify Insights Registration
+
+. Log into the insights portal at the link:https://cloud.redhat.com/insights/[Insights Dashboard^]
+
+[NOTE]
+The login information should be the same as your access.redhat.com credentials
+
+. Click Inventory from the bar menu on the left side of the screem
+. Within the search bar type `node.{GUID}.example.com`
+. Select the server from the filtered results to see the system information
+
+=== Create Remediation Playbook
+
+. Select `Advisor` from the tab selection next to `General Information`
+
+On the Advisor page we can see that Insights has detected some issues `New Ansible Engine packages are inaccessible when dedicated Ansible repo is not enabled`
+This issue is resolvable by an automatically generated playbook. 
+
+. Click the square box next to the `Description`
+. Click the blue `Remediate` button
+. Click the circle next to `Create new Playbook`
+. Name the playbook `remediate-ansible-repo-{GUID}`
+. Click the blue next button
+. Click the sliding button next to `Auto reboot` as this is not required to update a repository
+. Click the blue create button
+
+=== Download Remediation Playbook
+
+. Click `Remediations` from the bar menu on the left side of the screen
+. Click the box next to the remediation you created `remediate-ansible-repo-{GUID}`
+. Click the blue `Download playbooks` button and save the file locally
+. Browse this file to view the auto generated remediation
+
+Below is an example of what the playbook should look like. We can use this manual method to view what a rememdation playbook will exectue before implementing at scale.
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+- name: Enable ansible repo and update ansible package 
+  hosts: "node.example.com" 
+  become: true 
+ 
+  tasks: 
+    - name: Enable ansible repo 
+      command: subscription-manager repos --enable=rhel-7-server-ansible-2-rpms 
+      register: command_result 
+      changed_when: command_result.rc == 0 
+ 
+    - name: Update ansible package 
+      yum: 
+        name: ansible 
+        state: latest 
+ 
+ 
+- name: run insights 
+  hosts: "node.example.com" 
+  become: True 
+  gather_facts: False 
+  tasks: 
+    - name: run insights 
+      command: insights-client 
+      changed_when: false
+----

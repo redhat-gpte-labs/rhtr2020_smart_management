@@ -1,0 +1,100 @@
+:GUID: %unique_guid%
+:OSP_DOMAIN: %dns_zone%
+:TOWER_URL: %tower_url%
+:TOWER_ADMIN: %tower_admin%
+:TOWER_ADMIN_PASSWORD: %tower_admin_password%
+:SATELLITE_URL: %satellite_url%
+:SATELLITE_ADMIN: %satellite_admin%
+:SATELLITE_ADMIN_PASSWORD: %satellite_admin_password%
+:SSH_COMMAND: %ssh_command%
+:SSH_PASSWORD: %ssh_password%
+:organization_name: gpte
+:source-linenums-option:        
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+:data-uri:
+:linkattrs:
+:numbered:
+
+=== Before Starting 
+
+[IMPORTANT]
+Systems are registered to Red Hat Insights based on the subscription they have attached.
+This Lab was provisioned with a newly generated Red Hat Satellite manifest from the Red Hat internal `rhn-support` organization.
+If you do not have access to this specific org, or if you have a different account you will need to generate and upload a Satellite Manifest to complete this lab. To do this follow the steps from the KCS article link:https://access.redhat.com/solutions/3410771[How to create and upload or update and refresh a manifest to the Red Hat Satellite 6 server?^]
+
+[NOTE]
+You will only need one subscription on the Manifest to register the node system to the satellite and insights.
+
+You can access the Satellite webui at {SATELLITE_URL} using the username: *{SATELLITE_ADMIN}* and password: *{SATELLITE_ADMIN_PASSWORD}*
+
+After downloading the manifest from the customer portal, remove the old one from the web interface and then upload the new one as follows: 
+
+. Ensure you are in the *`gpte`* organization of the Satellite from the dropdown menu at the top left hand side of the web interface.
+. In the web UI, navigate to *Content* > *Subscriptions* > *Manage Manifest* and click *Delete*. In the second window, click *Delete* again. 
+. In the web UI, navigate to *Content* > *Subscriptions* > *Manage Manifest* and click *Choose file*. Select the Subscription Manifest, and then click *Upload*. 
+
+=== Register System to Local Satellite Configure Client for Insights
+
+. As the *`devops`* user ssh into the node system
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+$ ssh node
+----
+
+. Login as the root user of *`node`*
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+$ sudo -i
+----
+
+. Clean any remaning subscription information from the provisioning process
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+# subscription-manager unregister && subscription-manager clean
+# yum remove katello-ca-consumer-labsat.opentlc.com-1.0-9.noarch -y
+----
+
+. Run the below commands to download and install the *`katello-ca-consumer-latest.noarch.rpm`* hosted publicly from the lab satellite, and then to specify modify the contents of the katello.facts file.
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+# wget {SATELLITE_URL}/pub/katello-ca-consumer-latest.noarch.rpm --no-check-certificate
+# yum install katello-ca-consumer-latest.noarch.rpm -y
+# cat << EOF > /etc/rhsm/facts/katello.facts
+{"network.fqdn": "node.example.com"}
+EOF
+----
+
+. Register the system to the Satellite server of your local environment.
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+# subscription-manager register --username=admin --password={SATELLITE_ADMIN_PASSWORD} --org=gpte --auto-attach
+----
+
+=== Configure Client for Insights
+
+. Install the *`insights-client`* package on the system
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+$ yum install insights-client -y
+----
+
+. Register the system to Red Hat Insights
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+$ insights-client --register --display-name node.{GUID}.example.com
+----

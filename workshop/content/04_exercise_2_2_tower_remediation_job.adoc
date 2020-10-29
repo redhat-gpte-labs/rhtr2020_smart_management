@@ -1,0 +1,62 @@
+:GUID: %unique_guid%
+:OSP_DOMAIN: %dns_zone%
+:TOWER_URL: %tower_url%
+:TOWER_ADMIN: %tower_admin%
+:TOWER_ADMIN_PASSWORD: %tower_admin_password%
+:SATELLITE_URL: %satellite_url%
+:SATELLITE_ADMIN: %satellite_admin%
+:SATELLITE_ADMIN_PASSWORD: %satellite_admin_password%
+:SSH_COMMAND: %ssh_command%
+:SSH_PASSWORD: %ssh_password%
+:organization_name: gpte
+:source-linenums-option:        
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+:data-uri:
+:linkattrs:
+:numbered:
+
+== Execute Remediations from Tower
+In this section we will cover creating a job template to launch an Insights remediation playbook to our Satellite inventory.
+
+=== Create Job Template for Remediation
+
+. Navigate to the url for the Ansible Tower Web Interface provided in the email
+. From the bar on the left side of the screen click `Templates`
+. Click the green `+` symbol and select `Job Template from the drop down menu
+. Name the template `Insights Remediation`
+. Click the magnifying glass symbol under `Inventory`
+. Click the circle next to `Satellite inventory` from the menu that appears
+. Click the green `select` button
+. Click the magnifying glass symbol under `Project`
+. Click the circle next to `Insights RHTR` from the menu that appears
+. Click the green `select` button
+. Click the box under `Playbook` to activate the drop down menu
+. Click the `remediate-ansible-repo-{GUID}` playbook 
+. Click the magnifying glass symbol under `Credentials`
+. Click the circle next to `SSH Admin Key` from the menu that appears
+. Click the green `select` button
+. Click the box next to `Enable Privilege Escalation` under `Options`
+. Click the green `SAVE` button 
+
+[cols="1a",grid=none,width=80%]
+|===
+^| image::images/insights_template.png[]
+^| Figure 1 - Insights Template
+|===
+
+=== Launch The Remediation Job
+
+. Navigate to the url for the Ansible Tower Web Interface provided in the email
+. From the bar on the left side of the screen click `Templates`
+. Click the black rocket symbol on the same bar as "Insights Remediation" to launch the job
+
+Ansible Tower will redirect you to the job page where you can view the playbook completing.
+
+Once this has completed you have successfully launched a remediation from tower!
+
+[cols="1a",grid=none,width=80%]
+|===
+^| image::images/launch_job.png[]
+^| Figure 2 - Launch Job
+|===

@@ -1,0 +1,114 @@
+:GUID: %unique_guid%
+:OSP_DOMAIN: %dns_zone%
+:TOWER_URL: %tower_url%
+:TOWER_ADMIN: %tower_admin%
+:TOWER_ADMIN_PASSWORD: %tower_admin_password%
+:SATELLITE_URL: %satellite_url%
+:SATELLITE_ADMIN: %satellite_admin%
+:SATELLITE_ADMIN_PASSWORD: %satellite_admin_password%
+:SSH_COMMAND: %ssh_command%
+:SSH_PASSWORD: %ssh_password%
+:organization_name: gpte
+:source-linenums-option:        
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+:data-uri:
+:linkattrs:
+:numbered:
+
+== Configure Ansible Tower for Insights Access
+
+In this section we will configure Ansible Tower to connect to Insights and deploy remediations based on our Satellite 6 Inventory.
+
+=== Create Insights Credentials
+
+In order to access insights from Ansible Tower we need to first create a credential to be used.
+
+[NOTE]
+An example Insights Credential has been created for reference
+
+. Navigate to the url for the Ansible Tower Web Interface provided in the email
+. From the bar on the left side of the screen click `Credentials`
+. Click the green `+` symbol to begin creating a new credential
+. Name the credential `Insights RHTR`
+. Click the magnifing glass under `Organization`
+. Click the circle next to `gpte`
+. Click the green `select` button
+. Click the magnifing glass under `Credential Type`
+. Enter `Insights` into the search bar and press enter
+. Click the circle next to `Insights`
+. Click the green `select` button
+. Enter your Insights Username and Password into the corresponding boxes (This should be the same as your access.redhat.com login)
+.  Click the green `SAVE` button 
+
+[cols="1a",grid=none,width=80%]
+|===
+^| image::images/insights_credential.png[]
+^| Figure 1 - Insights Credential
+|===
+
+=== Create Insights Project
+
+Now we will create a Ansible Tower Project to connect to insights using the credentials we just created.
+[NOTE]
+An example project has been pre-created for reference
+
+. Navigate to the url for the Ansible Tower Web Interface provided in the email
+. From the bar on the left side of the screen click `Projects`
+. Click the green `+` symbol to begin creating a new project
+. Name the project `Insights Project`
+. Click the magnifying glass symbol under `Organization`
+. Click the circle next to `gpte` from the menu that appears
+. Click the green `select` button
+. Click the words `Choose an SCM Type` under `SCM Type`
+. Select `Red Hat Insights` From the dropdown menu
+. Click the magnifying glass symbol under `Credentials`
+. Click the circle next to `Insights RHTR` 
+. Click the green `select` button
+. Click box next to `Update Revision on Launch` under the `SCM update options`
+. Click the green `SAVE` button 
+. Click the circular double arrow symbol to synchroinze this project
+. Once the circle next to the project is green, proceed to the next steps
+
+[cols="1a",grid=none,width=80%]
+|===
+^| image::images/insights_project.png[]
+^| Figure 2 - Insights Project
+|===
+
+=== Create Inventory with hosts from Satellite
+
+We will now poll our Satellite 6 to generate an inventory based on the registered hosts.
+Already created for you is a base inventory labeled `Satellite Inventory`
+
+ Navigate to the url for the Ansible Tower Web Interface provided in the email
+. From the bar on the left side of the screen click `Inventories`
+. Click the pencil under actions on the `Satellite Inventory` line
+. Click the magnifying glass symbol under `Insights Credential`
+. Click the circle next to `Insights RHTR` from the menu that appears
+. Click the green `select` button
+. Click the green `SAVE` button 
+
+[cols="1a",grid=none,width=80%]
+|===
+^| image::images/satellite_inventory.png[]
+^| Figure 3 - Satellite Inventory
+|===
+
+=== Sync Hosts from Satellite Inventory
+
+. Continuing from the `Satellite Inventory` page
+. Click the `Source` button under the `Satellite Inventory` label
+
+The source `Satellite hosts` has aleady been created for you
+
+. Click the circular double arrow symbol to synchroinze this source
+. Once the cloud symbol next to `Satellite hosts` turns green proceed to next step
+. Click the `Hosts` button under the `Satellite Inventory` label
+. Verify that `node.example.com` and the satellite public url are listed
+
+[cols="1a",grid=none,width=80%]
+|===
+^| image::images/sync_inventory.png[]
+^| Figure 4 - Sync Inventory
+|===
