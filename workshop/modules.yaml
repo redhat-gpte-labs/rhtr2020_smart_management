@@ -20,9 +20,7 @@ modules:
     exit_sign: Exercise 2.2
   04_exercise_2_2_tower_remediation_job:
     name: Exercise 2.2 - Remediation Job Template
-    exit_sign: Exercise 3.1
-  04_exercise_3_1_webhook_for_push_event:
+    exit_sign: Exercise 2.2
+  04_exercise_3_1_bonus_lab:
     name: Exercise 3.1 - Webhook For Push Event
-    exit_sign: Exercise 3.2
-  05_grade_and_solve:
-    name: Grade And Solve
+    exit_sign: Exercise 3.1

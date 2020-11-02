@@ -1,11 +1,6 @@
 == Red Hat Remediation Lab
 Red Hat Tech Ready 2020
 
-Welcome to the Red Hat Remediation Lab. This lab will give you hands on experience with Red Hat Insights, Ansible Tower, and Ansible playbook writing.
+Welcome to the Red Hat Remediation Lab. This lab will give you hands on experience with Red Hat Insights, Ansible Tower, and Ansible playbook writing. Please watch this introductory video.
 
-This lab assumes:
-* You can use SSH to access remote systems
-* You have access to subscriptions from access.redhat.com (Needed for Insights)
-* You have a base knowledge of Ansible
-* You have expierence writing Ansible Playbooks
- 
+video::j44TMR-SyNo[youtube, width=640, height=360]

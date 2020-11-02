@@ -1,0 +1,169 @@
+:GUID: %unique_guid%
+:OSP_DOMAIN: %dns_zone%
+:TOWER_URL: %tower_url%
+:TOWER_ADMIN: %tower_admin%
+:TOWER_ADMIN_PASSWORD: %tower_admin_password%
+:SATELLITE_URL: %satellite_url%
+:SATELLITE_ADMIN: %satellite_admin%
+:SATELLITE_ADMIN_PASSWORD: %satellite_admin_password%
+:SSH_COMMAND: %ssh_command%
+:SSH_PASSWORD: %ssh_password%
+:organization_name: gpte
+:source-linenums-option:        
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+:data-uri:
+:linkattrs:
+:numbered:
+
+== Bonus Lab
+=== What to expect
+
+The goals of this section are to create playbooks that will:
+. Find the ID of a system based on the display name/s
+. Get the status of systems based on a list of IDs
+. Create a remediation playbook based on each auto solveable advisory
+
+=== Automating Insights
+
+In order for us to automate some of the processes we explored tonight we will need to leverage the Insights api with Ansibles uri module.
+
+You can find examples to build api calls from the link:https://cloud.redhat.com/docs/api/[Insights API Documentation]
+
+=== Retriving System IDs
+
+To get an Insights ID can poll the API to return values based on the `display name` we defined when originally registering the system to Insights.
+
+Below is an example of what a simple playbook to achive this could look like. Think about ways you could possibly make this more dynamic. Perhaps you could add variables and a loop to check against an entire host list instead of a single server.
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+- name: Retrieve insights_id from api
+    uri:
+    url: "https://cloud.redhat.com/api/inventory/v1/hosts?display_name=node.{GUID}.example.com"
+    method: GET
+    user: "{{ insights_username }}"
+    password: "{{ insights_password }}"
+    headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+    force_basic_auth: yes
+----
+
+*Example Output*
++
+[source,bash,subs="attributes,verbatim"]
+----
+----omitted-lines----
+    "account": "540155",
+    "ansible_host": null,
+    "bios_uuid": "148643ba-f420-4c71-8a23-70b5ab2c2c4d",
+    "created": "2020-10-28T17:26:47.970375+00:00",
+    "culled_timestamp": "2020-11-15T06:47:15.557918+00:00",
+    "display_name": "node.zrq27.example.com",
+    "external_id": null,
+    "facts": [],
+    "fqdn": "node.example.com",
+    "id": "18c7bfb9-0900-4ae9-b390-9f628e9419cf",
+    "insights_id": "f98fef6f-d793-4eca-8886-956ecbb427c0",
+    "ip_addresses": [
+        "192.168.47.32"
+    ],
+    "mac_addresses": [
+        "fa:16:3e:9a:d4:99",
+        "00:00:00:00:00:00"
+    ],
+    "reporter": "puptoo",
+    "rhel_machine_id": null,
+    "satellite_id": "f68bc2bb-2d62-4a3a-a693-456cdb27741a",
+    "stale_timestamp": "2020-11-01T06:47:15.557918+00:00",
+    "stale_warning_timestamp": "2020-11-08T06:47:15.557918+00:00",
+    "subscription_manager_id": "f68bc2bb-2d62-4a3a-a693-456cdb27741a",
+    "updated": "2020-10-31T04:47:15.589852+00:00"
+----omitted-lines----
+----
+
+=== Diagnosing Known Systems
+
+After obtaining an insights_id from the output of the previous play we can use it within our next api call. This one will poll the systems in your environment to see if any remediations are needed.
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+- name: Diagnose Systems for remediation
+    uri:
+    url: "https://cloud.redhat.com/api/remediations/v1/diagnosis/{{ insights_id }}"
+    method: GET
+    user: "{{ insights_username }}"
+    password: "{{ insights_password }}"
+    headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+    force_basic_auth: yes
+----
+
+*Example Output*
++
+[source,bash,subs="attributes,verbatim"]
+----
+{
+  "id": "18c7bfb9-0900-4ae9-b390-9f628e9419cf",
+  "insights_id": "f98fef6f-d793-4eca-8886-956ecbb427c0",
+  "details": {
+    "ansible_deprecated_repo|ANSIBLE_DEPRECATED_REPO": {
+      "type": "rule",
+      "package": "ansible-2.9.14-1.el7ae",
+      "error_key": "ANSIBLE_DEPRECATED_REPO"
+    }
+  }
+}
+----
+
+=== Create Remediations
+
+The last step to this will be to automatically create the remediation for the server. This can be done in a similar fashion to the example below.
+
++
+[source,bash,subs="attributes,verbatim"]
+----
+- name: Create Remediation Playbooks
+    uri:
+    url: "https://cloud.redhat.com/api/remediations/v1/remediations"
+    method: POST
+    user: "{{ insights_username }}"
+    password: "{{ insights_password }}"
+    headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+    body: >
+    {
+        "name": "Fix Critical CVEs",
+        "archived": true,
+        "auto_reboot": true,
+        "add": {
+            "issues": [
+            {
+                "id": "advisor:CVE_2017_6074_kernel|KERNEL_CVE_2017_6074",
+                "resolution": "mitigate",
+                "systems": [
+                "a8799a02-8be9-11e8-9eb6-529269fb1459"
+                ]
+            }
+            ]
+        }
+    }
+    body_format: json
+    status_code: 201, 208
+    force_basic_auth: yes
+----
+
+=== Launching the remedations
+
+Once you have fully automated creating the remediation playbooks the Tower after a insights source sync should have the newly created playbook as an option in the job template we created earlier.
+
+Use you imagination and ansible skills to automate these processes.
+
+=== Closing
+
+I hope you enjoyed the Red Hat Remediation Lab
