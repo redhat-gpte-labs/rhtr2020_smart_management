@@ -16,7 +16,8 @@
 == Bonus Lab
 === What to expect
 
-The goals of this section are to create playbooks that will:
+The goals of this section are to create playbooks that will
+
 . Find the ID of a system based on the display name/s
 . Get the status of systems based on a list of IDs
 . Create a remediation playbook based on each auto solveable advisory
