@@ -79,6 +79,7 @@ We will now poll our Satellite 6 to generate an inventory based on the registere
 Already created for you is a base inventory labeled `Satellite Inventory`
 
  Navigate to the url for the Ansible Tower Web Interface provided in the email
+ 
 . From the bar on the left side of the screen click `Inventories`
 . Click the pencil under actions on the `Satellite Inventory` line
 . Click the magnifying glass symbol under `Insights Credential`
