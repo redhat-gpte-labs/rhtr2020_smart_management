@@ -12,9 +12,6 @@
 :source-linenums-option:        
 :markup-in-source: verbatim,attributes,quotes
 :show_solution: true
-:data-uri:
-:linkattrs:
-:numbered:
 
 === Verify Insights Registration
 

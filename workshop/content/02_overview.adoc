@@ -12,9 +12,7 @@
 :source-linenums-option:        
 :markup-in-source: verbatim,attributes,quotes
 :show_solution: true
-:data-uri:
-:linkattrs:
-:numbered:
+
 
 *Red Hat Insights identifes and remediates security, compliance, and configuration risks in your Red Hat Enterprise Linux environments. Within this workshop you will learn to:*
 
